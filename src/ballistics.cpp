@@ -600,15 +600,15 @@ void projectile_attack( dealt_projectile_attack &attack, const projectile &proj_
                     }
                     // If the projectile has excess penetration, and would one-shot the enemy, make it continue through the trajectory.
                     // TODO: Add creature armor and armor penetration to condition.
-                    // TODO: Extend trajectory for targeted monster being first monster hit.
+                    // TODO: Add dispersion, and recalculate trajectory after every hit.
                     // TODO: Take into account creature physicality, in a more realistic way.
                     if( proj.proj_effects.count( ammo_effect_EXCESS_PEN ) &&
                         ( attack.dealt_dam.total_damage() >= attack.last_hit_critter->get_hp_max() ) ) {
                         // Reduces the projectile's damage based on the creature's size
                         // Numbers are roughly based on civil war journals, where a cannon shot would penetrate through about 3-4 people.
                         double size_mult =
-                            0.8 * ( 1 / ( static_cast<double>( attack.last_hit_critter->get_size() ) ) );
-                        proj.shot_impact.mult_damage( size_mult, true );
+                            1 - std::log( 1.5 * occupied_tile_fraction( attack.last_hit_critter->get_size() ) + 1 );
+                        proj.shot_impact.mult_damage( size_mult, false );
                     } else {
                         has_momentum = false;
                     }
